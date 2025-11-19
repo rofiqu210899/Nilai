@@ -1,0 +1,81 @@
+<div>
+    <div class="card mb-4">
+        <div class="card-header fw-bold">
+            Tambah Kategori
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label>Lomba</label>
+                    <select wire:model="lomba_id" class="form-control">
+                        <option value="">-- pilih lomba --</option>
+                        @foreach($lombas as $lomba)
+                        <option value="{{ $lomba->id }}">{{ $lomba->nama_lomba }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label>Nama Kategori</label>
+                    <input type="text" wire:model="kategori" class="form-control">
+                </div>
+
+                <div class="col-md-2">
+                    <label>&nbsp;</label>
+                    <button wire:click="save" class="btn btn-primary w-100">
+                        {{ $editingId ? 'Update' : 'Simpan' }}
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    {{-- TABEL JURI --}}
+    <div class="card">
+        <div class="card-header fw-bold">
+            Daftar Kategori
+        </div>
+        <div class="card-body p-0">
+
+            <table class="table table-bordered m-0">
+                <thead>
+                    <tr>
+                        <th style="width: 60px">#</th>
+                        <th>Lomba</th>
+                        <th>Kategori</th>
+                        <th style="width: 150px">Aksi</th>
+                    </tr>
+                </thead>
+
+                @php $no = 1; @endphp
+
+                <tbody>
+                    @forelse ($kategoris as $kategori)
+                    <tr>
+                        <td>{{ $no++ }}</td>
+                        <td>{{ $kategori->lomba->nama_lomba }}</td>
+                        <td>{{ $kategori->kategori }}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" wire:click="edit({{ $kategori->id }})">
+                                Edit
+                            </button>
+
+                            <button class="btn btn-danger btn-sm" wire:click="delete({{ $kategori->id }})">
+                                Hapus
+                            </button>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="text-center">Belum ada kategori</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+</div>
