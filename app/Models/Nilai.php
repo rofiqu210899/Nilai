@@ -36,4 +36,9 @@ class Nilai extends Model
     {
         return $this->belongsTo(Kategori::class, 'id_kategori');
     }
+
+    public function event()
+    {
+        return $this->belongsTo(events::class, 'id_event');
+    }
 }

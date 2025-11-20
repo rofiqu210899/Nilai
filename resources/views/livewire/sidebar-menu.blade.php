@@ -57,8 +57,12 @@
                 <span>• Nilai</span>
             </a>
             <a href="/event/{{ $event->id }}/rekap"
-                class="menu-item sub {{ request()->is('event/'.$event->id.'/nilai') ? 'active' : '' }}">
+                class="menu-item sub {{ request()->is('event/'.$event->id.'/rekap') ? 'active' : '' }}">
                 <span>• Rekap</span>
+            </a>
+            <a href="/event/{{ $event->id }}/excel"
+                class="menu-item sub {{ request()->is('event/'.$event->id.'/excel') ? 'active' : '' }}">
+                <span>• Export Excel</span>
             </a>
 
         </div>

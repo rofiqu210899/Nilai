@@ -3,6 +3,7 @@
 use App\Livewire\LombaPage;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\eventController;
+use App\Http\Controllers\excelController;
 use App\Http\Controllers\juriController;
 use App\Http\Controllers\kategoriController;
 use App\Http\Controllers\lombaController;
@@ -41,3 +42,5 @@ Route::get('/event/{eventId}/nilai', [nilaiController::class, 'index'])->name('i
 Route::get('/event/{eventId}/Kategori-Penilaian', [kategoriController::class, 'index'])->name('index');
 
 Route::get('/event/{eventId}/rekap', [rekapController::class, 'index'])->name('index');
+
+Route::get('/event/{eventId}/excel', [excelController::class, 'export']);
