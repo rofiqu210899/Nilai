@@ -36,6 +36,8 @@ class NilaiPage extends Component
             $this->pesertaList = Peserta::where('lomba_id', $this->lomba_id)
                 ->orderBy('nama_peserta')->get();
 
+            $this->kategoris = Kategori::where('lomba_id', $this->lomba_id)->get();
+
             // Ambil nilai yang sudah tersimpan untuk lomba + juri
             $nilaiDb = Nilai::where('id_event', $this->eventId)
                 ->where('id_lomba', $this->lomba_id)
