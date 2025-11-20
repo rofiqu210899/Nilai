@@ -13,7 +13,8 @@ class Nilai extends Model
         'id_lomba',
         'id_peserta',
         'id_juri',
-        'nilai',
+        'id_kategori',
+        'nilai'
     ];
 
     public function lomba()
@@ -29,5 +30,10 @@ class Nilai extends Model
     public function juri()
     {
         return $this->belongsTo(Juri::class, 'id_juri');
+    }
+
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class, 'id_kategori');
     }
 }

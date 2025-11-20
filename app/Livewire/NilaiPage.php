@@ -7,94 +7,83 @@ use App\Models\Nilai;
 use App\Models\Lomba;
 use App\Models\Peserta;
 use App\Models\Juri;
+use App\Models\Kategori;
 
 class NilaiPage extends Component
 {
     public $eventId;
-
     public $lomba_id;
-    public $peserta_id;
     public $juri_id;
-    public $nilai;
 
-    public $editingId = null;
+    public $pesertaList = [];
+    public $kategoris = [];
+    public $nilais = [];
+    public $inputs = []; // [peserta_id][kategori_id] => nilai
 
     public function mount($eventId)
     {
         $this->eventId = $eventId;
-    }
-
-    public function save()
-    {
-        $this->validate([
-            'lomba_id' => 'required',
-            'peserta_id' => 'required',
-            'juri_id' => 'required',
-            'nilai' => 'required|numeric|min:0|max:100',
-        ]);
-
-        if ($this->editingId) {
-            Nilai::where('id', $this->editingId)->update([
-                'id_lomba' => $this->lomba_id,
-                'id_peserta' => $this->peserta_id,
-                'id_juri' => $this->juri_id,
-                'nilai' => $this->nilai,
-            ]);
-
-            $this->resetForm();
-            return;
-        }
-
-        // Cegah penilaian ganda oleh juri yang sama
-        $exists = Nilai::where('id_lomba', $this->lomba_id)
-            ->where('id_peserta', $this->peserta_id)
-            ->where('id_juri', $this->juri_id)
-            ->exists();
-
-        if ($exists) {
-            session()->flash('error', 'Juri ini sudah menilai peserta tersebut.');
-            return;
-        }
-
-        Nilai::create([
-            'id_event' => $this->eventId,
-            'id_lomba' => $this->lomba_id,
-            'id_peserta' => $this->peserta_id,
-            'id_juri' => $this->juri_id,
-            'nilai' => $this->nilai,
-        ]);
-
-        $this->resetForm();
-    }
-
-    public function resetForm()
-    {
-        $this->reset(['lomba_id', 'peserta_id', 'juri_id', 'nilai', 'editingId']);
-    }
-
-    public function edit($id)
-    {
-        $n = Nilai::findOrFail($id);
-
-        $this->editingId = $n->id;
-        $this->lomba_id = $n->id_lomba;
-        $this->peserta_id = $n->id_peserta;
-        $this->juri_id = $n->id_juri;
-        $this->nilai = $n->nilai;
-    }
-
-    public function delete($id)
-    {
-        Nilai::find($id)->delete();
+        $this->kategoris = Kategori::all();
     }
 
     public function render()
     {
-        return view('livewire.nilai-page', [
-            'lombas' => Lomba::where('event_id', $this->eventId)->get(),
-            'pesertas' => Peserta::where('event_id', $this->eventId)->get(),
-            'juris' => Juri::where('event_id', $this->eventId)->get(),
-            'nilais' => Nilai::where('id_event', $this->eventId)->get(),
-        ]);
+        $lombas = Lomba::where('event_id', $this->eventId)->get();
+        $juris = Juri::where('event_id', $this->eventId)->get();
+
+        if ($this->lomba_id && $this->juri_id) {
+            // Ambil seluruh peserta untuk lomba
+            $this->pesertaList = Peserta::where('lomba_id', $this->lomba_id)
+                ->orderBy('nama_peserta')->get();
+
+            // Ambil nilai yang sudah tersimpan untuk lomba + juri
+            $nilaiDb = Nilai::where('id_event', $this->eventId)
+                ->where('id_lomba', $this->lomba_id)
+                ->where('id_juri', $this->juri_id)
+                ->get()
+                ->keyBy(function ($item) {
+                    // key: peserta_id + kategori_id
+                    return $item->id_peserta . '-' . $item->id_kategori;
+                });
+
+            // Mapping nilai ke inputs untuk form
+            foreach ($this->pesertaList as $peserta) {
+                foreach ($this->kategoris as $kategori) {
+                    $key = $peserta->id . '-' . $kategori->id;
+                    $this->inputs[$peserta->id][$kategori->id] = $nilaiDb[$key]->nilai ?? null;
+                }
+            }
+        }
+
+        return view('livewire.nilai-page', compact('lombas', 'juris'));
+    }
+
+    public function cari()
+    {
+        // trigger refresh Livewire
+    }
+
+    public function simpan()
+    {
+        foreach ($this->inputs as $peserta_id => $kategoriNilai) {
+            foreach ($kategoriNilai as $kategori_id => $nilai) {
+                if ($nilai !== null) {
+
+                    // dd($kategori_id);
+                    Nilai::updateOrCreate(
+                        [
+                            'id_event' => $this->eventId,
+                            'id_lomba' => $this->lomba_id,
+                            'id_juri' => $this->juri_id,
+                            'id_peserta' => $peserta_id,
+                            'id_kategori' => $kategori_id
+                        ],
+                        ['nilai' => $nilai]
+                    );
+                }
+            }
+        }
+
+        session()->flash('success', 'Nilai berhasil disimpan.');
     }
 }
