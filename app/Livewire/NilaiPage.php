@@ -29,26 +29,31 @@ class NilaiPage extends Component
     public function render()
     {
         $lombas = Lomba::where('event_id', $this->eventId)->get();
-        $juris = Juri::where('event_id', $this->eventId)->get();
 
+        // Filter juri berdasarkan lomba
+        $juris = $this->lomba_id
+            ? Juri::where('event_id', $this->eventId)
+            ->where('lomba_id', $this->lomba_id)
+            ->get()
+            : collect(); // kosong jika lomba belum dipilih
+        // dd($juris);
         if ($this->lomba_id && $this->juri_id) {
+
             // Ambil seluruh peserta untuk lomba
             $this->pesertaList = Peserta::where('lomba_id', $this->lomba_id)
                 ->orderBy('nama_peserta')->get();
 
+            // ambil kategori sesuai lomba
             $this->kategoris = Kategori::where('lomba_id', $this->lomba_id)->get();
 
-            // Ambil nilai yang sudah tersimpan untuk lomba + juri
+            // nilai yang sudah ada
             $nilaiDb = Nilai::where('id_event', $this->eventId)
                 ->where('id_lomba', $this->lomba_id)
                 ->where('id_juri', $this->juri_id)
                 ->get()
-                ->keyBy(function ($item) {
-                    // key: peserta_id + kategori_id
-                    return $item->id_peserta . '-' . $item->id_kategori;
-                });
+                ->keyBy(fn($item) => $item->id_peserta . '-' . $item->id_kategori);
 
-            // Mapping nilai ke inputs untuk form
+            // mapping nilai ke form
             foreach ($this->pesertaList as $peserta) {
                 foreach ($this->kategoris as $kategori) {
                     $key = $peserta->id . '-' . $kategori->id;
@@ -57,8 +62,18 @@ class NilaiPage extends Component
             }
         }
 
+
+
         return view('livewire.nilai-page', compact('lombas', 'juris'));
     }
+
+    public function updatedLombaId()
+    {
+        $this->juri_id = null;
+        $this->pesertaList = [];
+        $this->inputs = [];
+    }
+
 
     public function cari()
     {
