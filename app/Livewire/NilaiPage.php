@@ -41,7 +41,7 @@ class NilaiPage extends Component
 
             // Ambil seluruh peserta untuk lomba
             $this->pesertaList = Peserta::where('lomba_id', $this->lomba_id)
-                ->orderBy('nama_peserta', 'asc')->get();
+                ->orderBy('created_at', 'asc')->get();
 
             // ambil kategori sesuai lomba
             $this->kategoris = Kategori::where('lomba_id', $this->lomba_id)->get();
@@ -52,7 +52,7 @@ class NilaiPage extends Component
                 ->where('id_juri', $this->juri_id)
                 ->get()
                 ->keyBy(fn($item) => $item->id_peserta . '-' . $item->id_kategori);
-
+            // dd($this->pesertaList);
             // mapping nilai ke form
             foreach ($this->pesertaList as $peserta) {
                 foreach ($this->kategoris as $kategori) {
