@@ -1,4 +1,4 @@
-<div class="container mt-4">
+<div class="container mt-4" wire:poll.2s>
 
     @foreach($rekapPerLomba as $rekap)
     <div class="card mb-5 shadow-sm">
