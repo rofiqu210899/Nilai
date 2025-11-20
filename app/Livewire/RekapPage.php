@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Models\Juri;
 use App\Models\Lomba;
 use App\Models\Nilai;
 use App\Models\Peserta;
@@ -10,52 +9,51 @@ use Livewire\Component;
 
 class RekapPage extends Component
 {
-    public $lomba_id;
-    public $juri_id;
-    public $search = '';
-    public $sortField = 'total_nilai';
-    public $sortDirection = 'desc';
+    public $eventId; // jika Anda pakai event aktif
 
-    public function sortBy($field)
+    public function mount($eventId = null)
     {
-        if ($this->sortField == $field) {
-            $this->sortDirection = $this->sortDirection == 'asc' ? 'desc' : 'asc';
-        } else {
-            $this->sortField = $field;
-            $this->sortDirection = 'asc';
-        }
+        $this->eventId = $eventId ?? session('event_id');
     }
 
     public function render()
     {
-        $lombas = Lomba::all();
-        $juris = Juri::all();
+        // Ambil semua lomba di event
+        $lombas = Lomba::where('event_id', $this->eventId)->get();
+        // dd($this->eventId, $lombas);
 
-        // REKAP NILAI
-        $rekap = Peserta::with(['lomba'])
-            ->where('lomba_id', $this->lomba_id)
-            ->when($this->search, function ($q) {
-                $q->where('nama_peserta', 'like', "%$this->search%");
-            })
-            ->get()
-            ->map(function ($peserta) {
+        // Array untuk menampung hasil rekap semua lomba
+        $rekapPerLomba = [];
 
-                $query = Nilai::where('peserta_id', $peserta->id);
+        foreach ($lombas as $lomba) {
 
-                if ($this->juri_id) {
-                    $query->where('juri_id', $this->juri_id);
-                }
+            // Ambil peserta sesuai lomba
+            $pesertas = Peserta::where('lomba_id', $lomba->id)->get();
 
-                $peserta->total_nilai = $query->sum('nilai');
-                $peserta->rata_rata = $query->avg('nilai');
-                $peserta->jumlah_penilai = $query->count();
+            // Hitung nilai per peserta
+            $data = $pesertas->map(function ($peserta) use ($lomba) {
+
+                $nilaiQuery = Nilai::where('id_lomba', $lomba->id)
+                    ->where('id_peserta', $peserta->id);
+
+                $peserta->total_nilai = $nilaiQuery->sum('nilai');
+                $peserta->rata_rata = round($nilaiQuery->avg('nilai'), 2);
+                $peserta->jumlah_penilai = $nilaiQuery->count();
 
                 return $peserta;
             })
-            ->sortBy([
-                [$this->sortField, $this->sortDirection]
-            ]);
+                ->sortByDesc('total_nilai') // ranking otomatis
+                ->values();
 
-        return view('livewire.rekap-page', compact('rekap', 'lombas', 'juris'));
+            // Simpan hasil rekap
+            $rekapPerLomba[] = [
+                'lomba' => $lomba,
+                'pesertas' => $data,
+            ];
+        }
+
+        return view('livewire.rekap-page', [
+            'rekapPerLomba' => $rekapPerLomba
+        ]);
     }
 }

@@ -3,7 +3,7 @@
 <div class="content-area">
     <div class="row g-3 g-md-4">
         <!-- Stats Cards -->
-        @livewire('rekap-page');
+        @livewire('rekap-page',['eventId' => $eventId])
     </div>
 </div>
 @endsection

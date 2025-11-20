@@ -56,6 +56,10 @@
                 class="menu-item sub {{ request()->is('event/'.$event->id.'/nilai') ? 'active' : '' }}">
                 <span>• Nilai</span>
             </a>
+            <a href="/event/{{ $event->id }}/rekap"
+                class="menu-item sub {{ request()->is('event/'.$event->id.'/nilai') ? 'active' : '' }}">
+                <span>• Rekap</span>
+            </a>
 
         </div>
         @endif

@@ -6,8 +6,12 @@ use Illuminate\Http\Request;
 
 class rekapController extends Controller
 {
-    public function index()
+    public function index($eventId)
     {
-        return view('rekap');
+        // dd($eventId);
+        return view('rekap', [
+            'eventId' => $eventId,
+
+        ]);
     }
 }

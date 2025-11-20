@@ -40,4 +40,4 @@ Route::get('/event/{eventId}/nilai', [nilaiController::class, 'index'])->name('i
 
 Route::get('/event/{eventId}/Kategori-Penilaian', [kategoriController::class, 'index'])->name('index');
 
-Route::get('/rekap-nilai', [rekapController::class, 'index'])->name('rekap.index');
+Route::get('/event/{eventId}/rekap', [rekapController::class, 'index'])->name('index');
