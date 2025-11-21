@@ -13,7 +13,7 @@
                     <th>No</th>
                     <th>Peserta</th>
                     <th>Total Nilai</th>
-                    <th>Rata-rata</th>
+                    {{-- <th>Rata-rata</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -24,7 +24,7 @@
                     <td>{{ $peserta->no_peserta ?? '-' }}</td>
                     <td>{{ $peserta->nama_peserta }}</td>
                     <td class="text-success fw-bold">{{ $peserta->total_nilai }}</td>
-                    <td class="text-primary">{{ $peserta->rata_rata }}</td>
+                    {{-- <td class="text-primary">{{ $peserta->rata_rata }}</td> --}}
                 </tr>
                 @endforeach
 
