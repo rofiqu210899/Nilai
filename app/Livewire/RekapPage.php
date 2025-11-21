@@ -18,17 +18,15 @@ class RekapPage extends Component
 
     public function render()
     {
-        // Ambil semua lomba di event
         $lombas = Lomba::where('event_id', $this->eventId)->get();
 
         $rekapPerLomba = [];
 
         foreach ($lombas as $lomba) {
 
-            // Ambil peserta sesuai lomba
             $pesertas = Peserta::where('lomba_id', $lomba->id)->get();
 
-            // 🔹 Ambil semua kategori yang pernah dinilai pada lomba ini
+            // 🔹 Ambil semua kategori
             $kategoriList = Nilai::where('id_lomba', $lomba->id)
                 ->with('kategori')
                 ->get()
@@ -36,39 +34,52 @@ class RekapPage extends Component
                 ->unique('id')
                 ->values();
 
-            // Hitung nilai per peserta
-            $data = $pesertas->map(function ($peserta) use ($lomba, $kategoriList) {
+            // 🔹 Ambil semua juri yang menilai lomba tersebut
+            $juriList = Nilai::where('id_lomba', $lomba->id)
+                ->with('juri')
+                ->get()
+                ->pluck('juri')
+                ->unique('id')
+                ->values();
 
-                // Query dasar nilai peserta
+            $data = $pesertas->map(function ($peserta) use ($lomba, $kategoriList, $juriList) {
+
                 $nilaiQuery = Nilai::where('id_lomba', $lomba->id)
                     ->where('id_peserta', $peserta->id);
 
-                // 🔹 Hitungan total & rata-rata
+                // Total & rata-rata
                 $peserta->total_nilai = $nilaiQuery->sum('nilai');
                 $peserta->rata_rata   = round($nilaiQuery->avg('nilai'), 2);
-                $peserta->jumlah_penilai = $nilaiQuery->count();
 
-                // 🔹 Nilai per kategori
-                $nilaiPerKategori = [];
+                // ================================
+                // 🔥 NILAI PER KATEGORI PER JURI
+                // ================================
+                $nilaiPerKategoriJuri = [];
 
                 foreach ($kategoriList as $kat) {
-                    $nilaiPerKategori[$kat->kategori] = Nilai::where('id_lomba', $lomba->id)
-                        ->where('id_peserta', $peserta->id)
-                        ->where('id_kategori', $kat->id)
-                        ->sum('nilai') ?: 0;
+                    foreach ($juriList as $juri) {
+                        $nilai = Nilai::where('id_lomba', $lomba->id)
+                            ->where('id_peserta', $peserta->id)
+                            ->where('id_kategori', $kat->id)
+                            ->where('id_juri', $juri->id)
+                            ->value('nilai') ?? 0;
+
+                        $nilaiPerKategoriJuri[$kat->kategori][$juri->nama_juri] = $nilai;
+                    }
                 }
 
-                $peserta->nilai_per_kategori = $nilaiPerKategori;
+                $peserta->nilai_per_kategori_juri = $nilaiPerKategoriJuri;
 
                 return $peserta;
             })
                 ->sortByDesc('total_nilai')
                 ->values();
 
-            // Simpan hasil rekap
+            // Simpan rekap
             $rekapPerLomba[] = [
                 'lomba'        => $lomba,
                 'kategoriList' => $kategoriList,
+                'juriList'     => $juriList,
                 'pesertas'     => $data,
             ];
         }
