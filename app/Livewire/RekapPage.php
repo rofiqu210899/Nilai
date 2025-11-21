@@ -9,7 +9,7 @@ use Livewire\Component;
 
 class RekapPage extends Component
 {
-    public $eventId; // jika Anda pakai event aktif
+    public $eventId;
 
     public function mount($eventId = null)
     {
@@ -20,9 +20,7 @@ class RekapPage extends Component
     {
         // Ambil semua lomba di event
         $lombas = Lomba::where('event_id', $this->eventId)->get();
-        // dd($this->eventId, $lombas);
 
-        // Array untuk menampung hasil rekap semua lomba
         $rekapPerLomba = [];
 
         foreach ($lombas as $lomba) {
@@ -30,25 +28,48 @@ class RekapPage extends Component
             // Ambil peserta sesuai lomba
             $pesertas = Peserta::where('lomba_id', $lomba->id)->get();
 
-            // Hitung nilai per peserta
-            $data = $pesertas->map(function ($peserta) use ($lomba) {
+            // 🔹 Ambil semua kategori yang pernah dinilai pada lomba ini
+            $kategoriList = Nilai::where('id_lomba', $lomba->id)
+                ->with('kategori')
+                ->get()
+                ->pluck('kategori')
+                ->unique('id')
+                ->values();
 
+            // Hitung nilai per peserta
+            $data = $pesertas->map(function ($peserta) use ($lomba, $kategoriList) {
+
+                // Query dasar nilai peserta
                 $nilaiQuery = Nilai::where('id_lomba', $lomba->id)
                     ->where('id_peserta', $peserta->id);
 
+                // 🔹 Hitungan total & rata-rata
                 $peserta->total_nilai = $nilaiQuery->sum('nilai');
-                $peserta->rata_rata = round($nilaiQuery->avg('nilai'), 2);
+                $peserta->rata_rata   = round($nilaiQuery->avg('nilai'), 2);
                 $peserta->jumlah_penilai = $nilaiQuery->count();
+
+                // 🔹 Nilai per kategori
+                $nilaiPerKategori = [];
+
+                foreach ($kategoriList as $kat) {
+                    $nilaiPerKategori[$kat->kategori] = Nilai::where('id_lomba', $lomba->id)
+                        ->where('id_peserta', $peserta->id)
+                        ->where('id_kategori', $kat->id)
+                        ->sum('nilai') ?: 0;
+                }
+
+                $peserta->nilai_per_kategori = $nilaiPerKategori;
 
                 return $peserta;
             })
-                ->sortByDesc('total_nilai') // ranking otomatis
+                ->sortByDesc('total_nilai')
                 ->values();
 
             // Simpan hasil rekap
             $rekapPerLomba[] = [
-                'lomba' => $lomba,
-                'pesertas' => $data,
+                'lomba'        => $lomba,
+                'kategoriList' => $kategoriList,
+                'pesertas'     => $data,
             ];
         }
 

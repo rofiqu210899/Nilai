@@ -12,22 +12,29 @@
                     <th>Rank</th>
                     <th>No</th>
                     <th>Peserta</th>
+
+                    @foreach ($rekap['kategoriList'] as $kat)
+                    <th>{{ $kat->kategori }}</th>
+                    @endforeach
+
                     <th>Total Nilai</th>
-                    {{-- <th>Rata-rata</th> --}}
                 </tr>
             </thead>
-            <tbody>
 
-                @foreach($rekap['pesertas'] as $i => $peserta)
+            <tbody>
+                @foreach ($rekap['pesertas'] as $i => $peserta)
                 <tr>
                     <td>#{{ $i+1 }}</td>
-                    <td>{{ $peserta->no_peserta ?? '-' }}</td>
+                    <td>{{ $peserta->no_peserta }}</td>
                     <td>{{ $peserta->nama_peserta }}</td>
-                    <td class="text-success fw-bold">{{ $peserta->total_nilai }}</td>
-                    {{-- <td class="text-primary">{{ $peserta->rata_rata }}</td> --}}
+
+                    @foreach ($rekap['kategoriList'] as $kat)
+                    <td>{{ $peserta->nilai_per_kategori[$kat->kategori] }}</td>
+                    @endforeach
+
+                    <td class="fw-bold text-success">{{ $peserta->total_nilai }}</td>
                 </tr>
                 @endforeach
-
             </tbody>
         </table>
     </div>
