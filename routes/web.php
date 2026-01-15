@@ -31,6 +31,8 @@ Route::get('ImportPeserta', [eventController::class, 'ImportPeserta'])->name('Im
 
 Route::post('ProccessImportPeserta', [eventController::class, 'ProccessImportPeserta'])->name('ProccessImportPeserta');
 
+Route::post('ProccessImportKategori', [eventController::class, 'ProccessImportKategori'])->name('ProccessImportKategori');
+
 Route::get('/event/{eventId}/lomba', [lombaController::class, 'index'])
     ->name('lomba.index');
 

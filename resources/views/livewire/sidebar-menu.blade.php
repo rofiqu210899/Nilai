@@ -9,7 +9,7 @@
     </a>
 
     <a href="{{ route('ImportPeserta') }}" class="menu-item {{ request()->routeIs('ImportPeserta') ? 'active' : '' }}">
-        <i class="bi bi-graph-up"></i> <span>Import Peserta</span>
+        <i class="bi bi-graph-up"></i> <span>Import</span>
     </a>
 
     <div class="nav-heading px-3 py-3 text-uppercase text-white-50 small">
