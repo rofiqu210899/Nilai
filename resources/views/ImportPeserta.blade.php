@@ -19,7 +19,7 @@
                     <div class="mb-3">
                         <p>Format file Excel (.xlsx) yang diimpor harus sesuai dengan kolom berikut:</p>
                         <button class="btn btn-success btn-sm">
-                            <a href="{{ asset('Template_Export_Excel.xlsx') }}"
+                            <a href="{{ asset('TemplateImportExcel/Template_Export_Excel.xlsx') }}"
                                 style="color: white; text-decoration: none;" download>Download Template Excel</a>
                         </button>
                     </div>
