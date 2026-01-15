@@ -17,7 +17,6 @@
                 <input type="text" class="form-control" wire:model="name">
                 @error('name') <small class="text-danger">{{ $message }}</small> @enderror
             </div>
-
             <div class="mb-3">
                 <label>Tanggal Event</label>
                 <input type="date" class="form-control" wire:model="event_date">
@@ -47,6 +46,7 @@
                         <th>#</th>
                         <th>Nama Event</th>
                         <th>Tanggal Event</th>
+                        <th>ID Event</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -57,6 +57,7 @@
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $event->name }}</td>
                         <td>{{ $event->event_date }}</td>
+                        <td>{{ $event->id }}</td>
                         <td>
                             <button class="btn btn-sm btn-warning" wire:click="edit({{ $event->id }})">
                                 Edit

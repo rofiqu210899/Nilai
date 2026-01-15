@@ -27,10 +27,16 @@ Route::get('/', [eventController::class, 'index'])->name('index');
 
 Route::get('addEvent', [eventController::class, 'addEvent'])->name('addEvent');
 
+Route::get('ImportPeserta', [eventController::class, 'ImportPeserta'])->name('ImportPeserta');
+
+Route::post('ProccessImportPeserta', [eventController::class, 'ProccessImportPeserta'])->name('ProccessImportPeserta');
+
 Route::get('/event/{eventId}/lomba', [lombaController::class, 'index'])
     ->name('lomba.index');
+
 Route::get('/event/{eventId}/lomba', [lombaController::class, 'index'])
     ->name('lomba.index');
+
 Route::get('/event/{eventId}/peserta', [pesertaController::class, 'index'])
     ->name('peserta.index');
 

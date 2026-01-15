@@ -33,6 +33,7 @@
                     <tr>
                         <th style="width: 60px">#</th>
                         <th>Nama Lomba</th>
+                        <th>ID Lomba</th>
                         <th style="width: 150px">Aksi</th>
                     </tr>
                 </thead>
@@ -41,6 +42,7 @@
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $lomba->nama_lomba }}</td>
+                        <td>{{ $lomba->id }}</td>
                         <td>
                             <button class="btn btn-sm btn-warning" wire:click="edit({{ $lomba->id }})">
                                 Edit
