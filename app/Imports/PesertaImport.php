@@ -19,6 +19,7 @@ class PesertaImport implements ToModel, WithStartRow
             'event_id' => $row[1],
             'lomba_id' => $row[2],
             'nama_peserta' => $row[3],
+            'asal_sekolah' => $row[4],
         ]);
     }
 
