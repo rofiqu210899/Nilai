@@ -69,7 +69,7 @@ class eventController extends Controller
         $data->move(public_path('KategoriLomba'), $namafile);
 
         // Import data dari file yang diunggah
-        Excel::import(new KategoriImport, public_path('Kategorilomba/' . $namafile));
+        Excel::import(new KategoriImport, public_path('KategoriLomba/' . $namafile));
 
         // Kembali ke halaman sebelumnya dengan pesan sukses
         return redirect()->back()->with('success', 'File berhasil diunggah dan data berhasil diimport.');
